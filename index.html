@@ -367,25 +367,37 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
       const card = document.createElement("div");
       card.style.cssText = "padding:15px;border:1px solid #eee;border-radius:12px;background:white;";
 
+     
+      const content = document.createElement("div");
+      content.style.cssText = "display:flex;align-items:center;gap:14px;";
+
       if (item.image_url) {
         const img = document.createElement("img");
         img.src = item.image_url;
         img.alt = item.item_name;
-       img.style.cssText = "width:100%;height:140px;object-fit:contain;border-radius:8px;background:#faf7f2;";
-        card.appendChild(img);
+        img.style.cssText = "width:110px;height:95px;object-fit:contain;border-radius:8px;background:#faf7f2;flex-shrink:0;";
+        content.appendChild(img);
       }
 
+      const info = document.createElement("div");
+      info.style.cssText = "flex:1;min-width:0;";
+      content.appendChild(info);
+
+
+      
       const name = document.createElement("h4");
       name.textContent = item.item_name;
-      card.appendChild(name);
+      info.appendChild(name);
 
       const desc = document.createElement("p");
       desc.textContent = item.description || "";
-      card.appendChild(desc);
+      info.appendChild(desc);
 
       const price = document.createElement("strong");
       price.textContent = "₹" + Number(item.price).toFixed(0);
-      card.appendChild(price);
+      info.appendChild(price);
+
+      card.appendChild(content);
 
       grid.appendChild(card);
     });
