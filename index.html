@@ -371,7 +371,7 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
         const img = document.createElement("img");
         img.src = item.image_url;
         img.alt = item.item_name;
-        img.style.cssText = "width:100%;height:160px;object-fit:cover;border-radius:8px;";
+       img.style.cssText = "width:100%;height:140px;object-fit:contain;border-radius:8px;background:#faf7f2;";
         card.appendChild(img);
       }
 
