@@ -297,6 +297,82 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
  window.open("https://wa.me/" + CAFE_WHATSAPP_NUMBER + "?text=" + message, "_blank");
 });
 </script> 
+<script>
+(async function () {
+  const SUPABASE_URL = "https://tqbiglkfavwvubkezbse.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_cY3lmdFtlMdZ9NL1QaqUPw_Tsh0soYT";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const menuBox = document.getElementById("public-menu-list");
+
+  if (!menuBox) return;
+
+  const { data, error } = await client
+    .from("menu_items")
+    .select("id, category, item_name, description, price, image_url")
+    .eq("is_available", true)
+    .order("category")
+    .order("item_name");
+
+  if (error) {
+    menuBox.textContent = "Menu is temporarily unavailable. Please contact Café Adda.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    menuBox.textContent = "Our menu will be updated soon. Please visit Café Adda for details.";
+    return;
+  }
+
+  menuBox.innerHTML = "";
+
+  const categories = [...new Set(data.map(item => item.category))];
+
+  categories.forEach(category => {
+    const heading = document.createElement("h3");
+    heading.textContent = category;
+    heading.style.cssText = "margin:25px 0 12px;color:#8b4513;";
+    menuBox.appendChild(heading);
+
+    const grid = document.createElement("div");
+    grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;";
+
+    data.filter(item => item.category === category).forEach(item => {
+      const card = document.createElement("div");
+      card.style.cssText = "padding:15px;border:1px solid #eee;border-radius:12px;background:white;";
+
+      if (item.image_url) {
+        const img = document.createElement("img");
+        img.src = item.image_url;
+        img.alt = item.item_name;
+        img.style.cssText = "width:100%;height:160px;object-fit:cover;border-radius:8px;";
+        card.appendChild(img);
+      }
+
+      const name = document.createElement("h4");
+      name.textContent = item.item_name;
+      card.appendChild(name);
+
+      const desc = document.createElement("p");
+      desc.textContent = item.description || "";
+      card.appendChild(desc);
+
+      const price = document.createElement("strong");
+      price.textContent = "₹" + Number(item.price).toFixed(0);
+      card.appendChild(price);
+
+      grid.appendChild(card);
+    });
+
+    menuBox.appendChild(grid);
+  });
+})();
+</script>
+
 <!-- CAFE ADDA ADMIN PANEL -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
