@@ -298,6 +298,208 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
 
  window.open("https://wa.me/" + CAFE_WHATSAPP_NUMBER + "?text=" + message, "_blank");
 });
+</script> 
+<!-- CAFE ADDA ADMIN PANEL -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<section id="cafe-admin" style="max-width:650px;margin:40px auto;padding:22px;background:#fff8ed;border-radius:12px;color:#222;">
+  <h2>Café Adda Admin Panel</h2>
+  <p>Login to manage your menu</p>
+
+  <div id="admin-login">
+    <input id="admin-email" type="email" placeholder="Admin Email"
+      style="width:100%;padding:12px;margin:8px 0;box-sizing:border-box;">
+    <input id="admin-password" type="password" placeholder="Password"
+      style="width:100%;padding:12px;margin:8px 0;box-sizing:border-box;">
+    <button id="admin-login-btn" type="button">Admin Login</button>
+  </div>
+
+  <div id="admin-dashboard" hidden>
+    <hr>
+    <h3>Add Menu Item</h3>
+
+    <input id="menu-category" placeholder="Category (Chinese / Indian)"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;">
+
+    <input id="menu-name" placeholder="Item Name"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;">
+
+    <input id="menu-description" placeholder="Description"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;">
+
+    <input id="menu-price" type="number" min="0" step="0.01" placeholder="Price ₹"
+      style="width:100%;padding:12px;margin:6px 0;box-sizing:border-box;">
+
+    <label>Menu Item Photo</label>
+    <input id="menu-image" type="file" accept="image/*"
+      style="display:block;margin:12px 0;">
+
+    <button id="menu-save-btn" type="button">Upload Menu Item</button>
+    <p id="admin-message"></p>
+
+    <hr>
+    <h3>Existing Menu Items</h3>
+    <div id="admin-menu-list"></div>
+
+    <button id="admin-logout-btn" type="button">Logout</button>
+  </div>
+</section>
+
+<script>
+(function () {
+  const SUPABASE_URL = "https://tqbiglkfavwvubkezbse.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_cY3lmdFtlMdZ9NL1QaqUPw_Tsh0soYT";
+
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const loginBox = document.getElementById("admin-login");
+  const dashboard = document.getElementById("admin-dashboard");
+  const message = document.getElementById("admin-message");
+
+  async function showDashboard() {
+    const { data: { user } } = await db.auth.getUser();
+
+    if (!user || user.email !== "cafeaddaraiganj03@gmail.com") {
+      loginBox.hidden = false;
+      dashboard.hidden = true;
+      return;
+    }
+
+    loginBox.hidden = true;
+    dashboard.hidden = false;
+    loadMenu();
+  }
+
+  document.getElementById("admin-login-btn").onclick = async function () {
+    const email = document.getElementById("admin-email").value.trim();
+    const password = document.getElementById("admin-password").value;
+
+    const { error } = await db.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      alert("Login failed: " + error.message);
+      return;
+    }
+
+    showDashboard();
+  };
+
+  document.getElementById("menu-save-btn").onclick = async function () {
+    message.textContent = "Uploading...";
+
+    const category = document.getElementById("menu-category").value.trim();
+    const itemName = document.getElementById("menu-name").value.trim();
+    const description = document.getElementById("menu-description").value.trim();
+    const price = document.getElementById("menu-price").value;
+    const file = document.getElementById("menu-image").files[0];
+
+    if (!category || !itemName || price === "" || Number(price) < 0) {
+      message.textContent = "Please enter category, item name and valid price.";
+      return;
+    }
+
+    let imageUrl = null;
+
+    if (file) {
+      if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+        message.textContent = "Please select an image smaller than 5 MB.";
+        return;
+      }
+
+      const safeName = Date.now() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+      const { error: uploadError } = await db.storage
+        .from("menu-images")
+        .upload(safeName, file);
+
+      if (uploadError) {
+        message.textContent = "Image upload failed: " + uploadError.message;
+        return;
+      }
+
+      const { data } = db.storage.from("menu-images").getPublicUrl(safeName);
+      imageUrl = data.publicUrl;
+    }
+
+    const { error } = await db.from("menu_items").insert([{
+      category,
+      item_name: itemName,
+      description,
+      price: Number(price),
+      image_url: imageUrl
+    }]);
+
+    if (error) {
+      message.textContent = "Save failed: " + error.message;
+      return;
+    }
+
+    message.textContent = "Menu item added successfully!";
+
+    document.getElementById("menu-category").value = "";
+    document.getElementById("menu-name").value = "";
+    document.getElementById("menu-description").value = "";
+    document.getElementById("menu-price").value = "";
+    document.getElementById("menu-image").value = "";
+
+    loadMenu();
+  };
+
+  async function loadMenu() {
+    const { data, error } = await db
+      .from("menu_items")
+      .select("*")
+      .order("id", { ascending: false });
+
+    const list = document.getElementById("admin-menu-list");
+
+    if (error) {
+      list.textContent = "Could not load menu: " + error.message;
+      return;
+    }
+
+    list.innerHTML = "";
+
+    data.forEach(function (item) {
+      const div = document.createElement("div");
+      div.style.cssText = "padding:12px;border-bottom:1px solid #ddd;";
+
+      const title = document.createElement("strong");
+      title.textContent = item.item_name + " — ₹" + item.price;
+
+      const details = document.createElement("p");
+      details.textContent = item.category + " | " + (item.description || "");
+
+      const del = document.createElement("button");
+      del.textContent = "Delete";
+      del.type = "button";
+
+      del.onclick = async function () {
+        if (!confirm("Delete " + item.item_name + "?")) return;
+
+        const { error } = await db.from("menu_items").delete().eq("id", item.id);
+
+        if (error) {
+          alert(error.message);
+        } else {
+          loadMenu();
+        }
+      };
+
+      div.append(title, details, del);
+      list.appendChild(div);
+    });
+  }
+
+  document.getElementById("admin-logout-btn").onclick = async function () {
+    await db.auth.signOut();
+    showDashboard();
+  };
+
+  showDashboard();
+})();
 </script>
+<!-- END CAFE ADDA ADMIN PANEL -->
+
 </body>
 </html>
