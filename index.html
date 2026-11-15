@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Café Adda | Raiganj</title>
+<meta name="description" content="Welcome to Café Adda, Raiganj. Explore our café, enquire about bookings and contact us.">
+<style>
+:root{
+  --wine:#651d32;
+  --dark:#291820;
+  --gold:#c69b58;
+  --cream:#fbf6ed;
+  --white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--dark);line-height:1.6}
+a{text-decoration:none;color:inherit}
+header{background:var(--white);position:sticky;top:0;z-index:10;box-shadow:0 2px 15px #00000012}
+.nav{max-width:1150px;margin:auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--wine)}
+.brand-mark{width:43px;height:43px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-size:22px}
+.brand strong{font-family:Georgia,serif;font-size:22px}
+nav{display:flex;gap:23px;align-items:center;font-size:14px}
+nav a:hover{color:var(--gold)}
+.btn{display:inline-block;background:var(--wine);color:white;padding:12px 21px;border-radius:5px;font-weight:bold;border:0;cursor:pointer}
+.btn:hover{background:#421323}
+.hero{min-height:540px;background:linear-gradient(90deg,#24131be8,#24131b72),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=85') center/cover;display:flex;align-items:center;color:white}
+.hero-inner{max-width:1150px;width:100%;margin:auto;padding:75px 25px}
+.eyebrow{color:#e5c58e;letter-spacing:4px;text-transform:uppercase;font-size:12px;font-weight:bold}
+.hero h1{font: bold clamp(42px,7vw,76px)/1.08 Georgia,serif;max-width:700px;margin:18px 0}
+.hero p{font-size:17px;max-width:550px;color:#f4e9e9;margin-bottom:28px}
+section{padding:75px 22px}
+.container{max-width:1100px;margin:auto}
+.section-head{text-align:center;margin-bottom:35px}
+.section-head span{color:var(--gold);text-transform:uppercase;letter-spacing:3px;font-size:12px;font-weight:bold}
+.section-head h2{font: bold clamp(30px,4vw,43px) Georgia,serif;color:var(--wine);margin:8px 0}
+.section-head p{color:#74676a}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:45px;align-items:center}
+.about-art{min-height:330px;border-radius:12px;background:linear-gradient(#401c2a33,#401c2a33),url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=85') center/cover}
+.about-copy h3{font:30px Georgia,serif;color:var(--wine);margin-bottom:15px}
+.about-copy p{color:#685b5e;margin-bottom:14px}
+.menu-section{background:#fff}
+.menu-empty{border:1px dashed #cbbba9;border-radius:12px;padding:42px 20px;text-align:center;background:var(--cream)}
+.menu-empty .cup{font-size:40px}
+.menu-empty h3{font:25px Georgia,serif;color:var(--wine);margin:10px}
+.menu-empty p{color:#776b6b}
+.booking{background:var(--wine);color:white}
+.booking .section-head h2{color:white}
+.booking .section-head p{color:#eadde0}
+.booking-card{max-width:760px;margin:auto;background:white;color:var(--dark);padding:30px;border-radius:12px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:bold;color:#51434a}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ddd1d1;border-radius:5px;font:inherit;background:white;color:#33252a}
+textarea{min-height:90px;resize:vertical}
+.booking-card button{margin-top:20px;width:100%;font-size:15px}
+.note{font-size:12px;color:#766b6b;margin-top:12px}
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.contact-card{background:white;padding:25px;border-radius:9px;text-align:center;border:1px solid #eee3d9}
+.contact-card .symbol{font-size:27px}
+.contact-card h3{font:21px Georgia,serif;color:var(--wine);margin:8px}
+.contact-card p{font-size:14px;color:#71666a}
+.contact-card a{color:var(--wine);font-weight:bold}
+.map-link{display:inline-block;margin-top:22px;color:var(--wine);font-weight:bold;text-decoration:underline}
+footer{background:#24131b;color:#eee;padding:35px 20px;text-align:center}
+footer strong{font:26px Georgia,serif;color:#e5c58e}
+footer p{font-size:13px;color:#d4c6ca;margin-top:8px}
+footer .footlinks{margin-top:15px;display:flex;justify-content:center;gap:20px;font-size:13px}
+@media(max-width:720px){
+ nav{gap:12px;font-size:12px;flex-wrap:wrap;justify-content:flex-end}
+ nav a{display:none}
+ .nav{padding:12px 15px}
+ .brand strong{font-size:19px}
+ .hero{min-height:490px}
+ .about-grid{grid-template-columns:1fr}
+ .about-art{min-height:240px}
+ .contact-grid{grid-template-columns:1fr}
+ .form-grid{grid-template-columns:1fr}
+ .field.full{grid-column:auto}
+ section{padding:58px 17px}
+ .booking-card{padding:21px}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="nav">
+  <a class="brand" href="#home">
+   <span class="brand-mark">☕</span>
+   <strong>Café Adda</strong>
+  </a>
+  <nav>
+   <a href="#home">Home</a>
+   <a href="#about">About</a>
+   <a href="#menu">Menu</a>
+   <a href="#booking">Booking</a>
+   <a href="#contact">Contact</a>
+   <a class="btn" href="#booking">Book a Table</a>
+  </nav>
+ </div>
+</header>
+
+<main>
+<section class="hero" id="home">
+ <div class="hero-inner">
+  <div class="eyebrow">Welcome to Café Adda</div>
+  <h1>Good Food.<br>Great Conversations.</h1>
+  <p>Your place to relax, enjoy delicious food and make memorable moments with friends and family.</p>
+  <a class="btn" href="#booking">Enquire for Booking</a>
+ </div>
+</section>
+
+<section id="about">
+ <div class="container about-grid">
+  <div class="about-art"></div>
+  <div class="about-copy">
+   <div class="eyebrow">A little about us</div>
+   <h3>More than just a café.</h3>
+   <p>Welcome to Café Adda, a place where food, friendship and conversations come together.</p>
+   <p>Whether you are meeting friends, spending time with family or planning a small celebration, we look forward to welcoming you.</p>
+   <p><strong>Café Adda – Your adda, your moments.</strong></p>
+   <a class="btn" href="#contact">Find Us</a>
+  </div>
+ </div>
+</section>
+
+<section class="menu-section" id="menu">
+ <div class="container">
+  <div class="section-head">
+   <span>Discover our food</span>
+   <h2>Our Menu</h2>
+   <p>Something delicious is waiting for you.</p>
+  </div>
+  <div class="menu-empty">
+   <div class="cup">🍽️</div>
+   <h3>Menu Coming Soon</h3>
+   <p>We are updating our menu. Please visit us or contact Café Adda for current menu details.</p>
+  </div>
+ </div>
+</section>
+
+<section class="booking" id="booking">
+ <div class="container">
+  <div class="section-head">
+   <span>Plan your visit</span>
+   <h2>Booking Enquiry</h2>
+   <p>Planning a birthday, party or get-together? Send us your enquiry.</p>
+  </div>
+  <div class="booking-card">
+   <form id="bookingForm">
+    <div class="form-grid">
+     <div class="field">
+      <label for="name">Your Name *</label>
+      <input id="name" required placeholder="Enter your name">
+     </div>
+     <div class="field">
+      <label for="phone">Mobile Number *</label>
+      <input id="phone" required type="tel" pattern="[0-9+\-\s]{10,15}" placeholder="Your contact number">
+     </div>
+     <div class="field">
+      <label for="guests">Number of Guests *</label>
+      <select id="guests" required>
+       <option value="">Select guests</option>
+       <option>1</option><option>2</option><option>3</option><option>4</option>
+       <option>5</option><option>6</option><option>7</option><option>8</option>
+       <option>9</option><option>10</option><option>15</option><option>20</option>
+       <option>25</option><option>30</option><option>35</option><option>40</option>
+       <option>45</option><option>50</option>
+      </select>
+     </div>
+     <div class="field">
+      <label for="occasion">Occasion</label>
+      <select id="occasion">
+       <option>Casual Dining</option>
+       <option>Birthday Party</option>
+       <option>Anniversary</option>
+       <option>Family Get-together</option>
+       <option>Corporate Meeting</option>
+       <option>Other</option>
+      </select>
+     </div>
+     <div class="field">
+      <label for="date">Preferred Date *</label>
+      <input id="date" type="date" required>
+     </div>
+     <div class="field">
+      <label for="time">Preferred Time *</label>
+      <input id="time" type="time" required>
+     </div>
+     <div class="field full">
+      <label for="payment">Payment Preference</label>
+      <select id="payment">
+       <option>Cash on Delivery / Pay at Café</option>
+       <option>UPI</option>
+      </select>
+     </div>
+     <div class="field full">
+      <label for="message">Additional Requirements</label>
+      <textarea id="message" placeholder="Tell us about your requirements..."></textarea>
+     </div>
+    </div>
+    <button class="btn" type="submit">Send Booking Enquiry on WhatsApp</button>
+    <p class="note">This is an enquiry, not a confirmed booking. Our team will contact you to confirm availability and details. No online payment is collected through this form.</p>
+   </form>
+  </div>
+ </div>
+</section>
+
+<section id="contact">
+ <div class="container">
+  <div class="section-head">
+   <span>Come say hello</span>
+   <h2>Contact Café Adda</h2>
+   <p>We would love to hear from you.</p>
+  </div>
+  <div class="contact-grid">
+   <div class="contact-card">
+    <div class="symbol">📍</div>
+    <h3>Our Location</h3>
+    <p>Raiganj, Uttar Dinajpur<br>West Bengal, India</p>
+   </div>
+   <div class="contact-card">
+    <div class="symbol">📞</div>
+    <h3>Call Us</h3>
+    <p>Contact us for enquiries and bookings.</p>
+    <a href="#booking">Send an enquiry</a>
+   </div>
+   <div class="contact-card">
+    <div class="symbol">🎉</div>
+    <h3>Events & Parties</h3>
+    <p>Birthday parties, family gatherings and meetings.</p>
+    <a href="#booking">Enquire now</a>
+   </div>
+  </div>
+  <div style="text-align:center">
+   <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Cafe+Adda+Raiganj" target="_blank" rel="noopener">Find Café Adda on Google Maps ↗</a>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer>
+ <strong>Café Adda</strong>
+ <p>Good Food. Great Conversations.</p>
+ <p>Raiganj, Uttar Dinajpur, West Bengal, India</p>
+ <div class="footlinks">
+  <a href="#home">Home</a>
+  <a href="#menu">Menu</a>
+  <a href="#booking">Booking</a>
+  <a href="#contact">Contact</a>
+ </div>
+ <p style="margin-top:20px">© <span id="year"></span> Café Adda. All rights reserved.</p>
+</footer>
+
+<script>
+// IMPORTANT: Replace this with Café Adda's WhatsApp number.
+// Use country code 91 followed by the 10-digit mobile number.
+// Example format: 919876543210
+const CAFE_WHATSAPP_NUMBER = "91XXXXXXXXXX";
+
+document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("date").min = new Date().toISOString().split("T")[0];
+
+document.getElementById("bookingForm").addEventListener("submit", function(e){
+ e.preventDefault();
+
+ if(CAFE_WHATSAPP_NUMBER.includes("X")){
+  alert("Website setup is working. The Café Adda WhatsApp number still needs to be added before booking enquiries can be sent.");
+  return;
+ }
+
+ const data = {
+  name: document.getElementById("name").value.trim(),
+  phone: document.getElementById("phone").value.trim(),
+  guests: document.getElementById("guests").value,
+  occasion: document.getElementById("occasion").value,
+  date: document.getElementById("date").value,
+  time: document.getElementById("time").value,
+  payment: document.getElementById("payment").value,
+  message: document.getElementById("message").value.trim()
+ };
+
+ const message =
+  "Hello Café Adda! I would like to make a booking enquiry.%0A%0A" +
+  "Name: " + encodeURIComponent(data.name) + "%0A" +
+  "Mobile: " + encodeURIComponent(data.phone) + "%0A" +
+  "Guests: " + encodeURIComponent(data.guests) + "%0A" +
+  "Occasion: " + encodeURIComponent(data.occasion) + "%0A" +
+  "Date: " + encodeURIComponent(data.date) + "%0A" +
+  "Time: " + encodeURIComponent(data.time) + "%0A" +
+  "Payment preference: " + encodeURIComponent(data.payment) + "%0A" +
+  "Requirements: " + encodeURIComponent(data.message);
+
+ window.open("https://wa.me/" + CAFE_WHATSAPP_NUMBER + "?text=" + message, "_blank");
+});
+</script>
+</body>
+</html>
