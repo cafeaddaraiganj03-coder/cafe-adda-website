@@ -365,7 +365,99 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
   }
 
   menuBox.innerHTML = "";
+// CAFÉ ADDA SHOPPING CART
+const cart = new Map();
 
+const cartBox = document.createElement("div");
+cartBox.id = "cafe-shopping-cart";
+cartBox.style.cssText =
+  "background:#fff8ef;padding:20px;border-radius:14px;margin:20px 0;border:1px solid #ead8c5;";
+
+menuBox.appendChild(cartBox);
+
+function renderCart() {
+  cartBox.innerHTML = "";
+
+  const title = document.createElement("h3");
+  title.textContent = "🛒 Your Shopping Cart";
+  cartBox.appendChild(title);
+
+  let total = 0;
+
+  cart.forEach((entry) => {
+    total += entry.price * entry.qty;
+
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee;";
+
+    const name = document.createElement("span");
+    name.textContent = entry.name + " — ₹" + entry.price;
+
+    const controls = document.createElement("div");
+
+    const minus = document.createElement("button");
+    minus.textContent = "−";
+    minus.onclick = () => {
+      entry.qty--;
+      if (entry.qty <= 0) cart.delete(entry.id);
+      renderCart();
+    };
+
+    const qty = document.createElement("span");
+    qty.textContent = " " + entry.qty + " ";
+
+    const plus = document.createElement("button");
+    plus.textContent = "+";
+    plus.onclick = () => {
+      entry.qty++;
+      renderCart();
+    };
+
+    controls.append(minus, qty, plus);
+    row.append(name, controls);
+    cartBox.appendChild(row);
+  });
+
+  const totalText = document.createElement("h3");
+  totalText.textContent = "Total: ₹" + total;
+  cartBox.appendChild(totalText);
+const orderButton = document.createElement("button");
+orderButton.textContent = "Place Order on WhatsApp";
+orderButton.type = "button";
+orderButton.style.cssText =
+  "background:#25D366;color:white;border:0;padding:14px 20px;border-radius:9px;font-weight:bold;cursor:pointer;width:100%;margin-top:12px;";
+
+orderButton.onclick = function () {
+  if (cart.size === 0) {
+    alert("Please add food items to your cart.");
+    return;
+  }
+
+  let message = "Hello Café Adda! I want to place an order:\n\n";
+  let total = 0;
+
+  cart.forEach(entry => {
+    message += entry.name + " x " + entry.qty +
+      " = ₹" + (entry.price * entry.qty) + "\n";
+    total += entry.price * entry.qty;
+  });
+
+  message += "\nTotal: ₹" + total;
+  message += "\n\nPlease confirm my order.";
+
+  window.open(
+    "https://wa.me/919475611122?text=" + encodeURIComponent(message),
+    "_blank"
+  );
+};
+
+cartBox.appendChild(orderButton);
+  if (cart.size === 0) {
+    cartBox.append("Your cart is empty. Add your favourite food!");
+  }
+}
+
+renderCart();
   const categories = [...new Set(data.map(item => item.category))];
 
   categories.forEach(category => {
@@ -410,7 +502,30 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
       const price = document.createElement("strong");
       price.textContent = "₹" + Number(item.price).toFixed(0);
       info.appendChild(price);
+const addButton = document.createElement("button");
+addButton.textContent = "＋ Add to Cart";
+addButton.type = "button";
+addButton.style.cssText =
+  "background:#7b263e;color:white;border:0;padding:10px 15px;border-radius:8px;cursor:pointer;margin-top:10px;";
 
+addButton.onclick = function () {
+  const existing = cart.get(item.id);
+
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.set(item.id, {
+      id: item.id,
+      name: item.item_name,
+      price: Number(item.price),
+      qty: 1
+    });
+  }
+
+  renderCart();
+};
+
+info.appendChild(addButton);
       card.appendChild(content);
 
       grid.appendChild(card);
