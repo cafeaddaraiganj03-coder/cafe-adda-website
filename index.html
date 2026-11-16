@@ -1077,8 +1077,28 @@ async function loadOrders() {
       " | Type: " + order.fulfilment_type +
       " | Payment: " + order.payment_method;
 
-    const items = document.createElement("p");
-    items.textContent = "Items: " + JSON.stringify(order.order_items);
+    const itemsBox = document.createElement("div");
+itemsBox.style.cssText =
+  "background:#faf6f0;padding:12px;border-radius:8px;margin:12px 0;";
+
+const itemsTitle = document.createElement("h4");
+itemsTitle.textContent = "Order Items";
+itemsBox.appendChild(itemsTitle);
+
+(order.order_items || []).forEach(item => {
+  const itemRow = document.createElement("div");
+  itemRow.style.cssText =
+    "display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee;";
+
+  const itemName = document.createElement("span");
+  itemName.textContent = item.name + " × " + item.qty;
+
+  const itemPrice = document.createElement("strong");
+  itemPrice.textContent = "₹" + (item.price * item.qty);
+
+  itemRow.append(itemName, itemPrice);
+  itemsBox.appendChild(itemRow);
+});
 
     const total = document.createElement("h3");
     total.textContent = "Total: ₹" + order.total_amount;
