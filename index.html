@@ -1042,6 +1042,20 @@ info.appendChild(addButton);
       list.appendChild(div);
     });
   }
+  async function updateOrderStatus(orderId, newStatus) {
+  const { error } = await db
+    .from("orders")
+    .update({ order_status: newStatus })
+    .eq("id", orderId);
+
+  if (error) {
+    alert("Status update failed: " + error.message);
+    return;
+  }
+
+  alert("Order " + newStatus + " successfully!");
+  loadOrders();
+}
 async function loadOrders() {
   const box = document.getElementById("admin-orders-list");
   box.textContent = "Loading Orders...";
