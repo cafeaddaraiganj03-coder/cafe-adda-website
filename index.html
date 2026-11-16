@@ -159,34 +159,21 @@ footer .footlinks{margin-top:15px;display:flex;justify-content:center;gap:20px;f
   </div>
  </div>
 </section>
+
 <section id="cafe-gallery" style="background:#faf6f0;padding:70px 22px;">
- <div class="container">
-  <div class="section-head">
-   <span>OUR MEMORIES</span>
-   <h2>Café Adda Gallery</h2>
-   <p>A glimpse of our food, ambience and moments.</p>
+  <div class="container">
+    <div class="section-head">
+      <span>OUR MEMORIES</span>
+      <h2>Café Adda Gallery</h2>
+      <p>A glimpse of our food, ambience and moments.</p>
+    </div>
+
+    <div id="public-gallery-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
+      <p style="text-align:center;">Loading Café Adda Gallery...</p>
+    </div>
   </div>
-
-  <h3 style="color:#6b293d;margin:30px 0 18px;">Our Food</h3>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
-
-   <img src="cafe-food-1.jpg" alt="Café Adda food" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-   <img src="cafe-food-2.jpg" alt="Café Adda drinks" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-   <img src="cafe-food-3.jpg" alt="Café Adda grilled octopus" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-   <img src="cafe-food-4.jpg" alt="Café Adda special dish" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-
-  </div>
-
-  <h3 style="color:#6b293d;margin:40px 0 18px;">Our Ambience</h3>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
-
-   <img src="cafe-interior.jpg.jfif" alt="Café Adda seating area" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-   <img src="cafe-interior3.jpg" alt="Café Adda interior" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-   <img src="cafe-interior4.jpg" alt="Café Adda ambience" style="width:100%;height:220px;object-fit:cover;border-radius:12px;">
-
-  </div>
- </div>
 </section>
+
 
 <section class="booking" id="booking">
  <div class="container">
@@ -434,6 +421,53 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
 })();
 </script>
 
+<script>
+(async function () {
+  const SUPABASE_URL = "https://tqbiglkfavwvubkezbse.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_cY3lmdFtlMdZ9NL1QaqUPw_Tsh0soYT";
+
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const gallery = document.getElementById("public-gallery-list");
+
+  if (!gallery) return;
+
+  const { data, error } = await client
+    .from("gallery_items")
+    .select("id, category, image_url")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    gallery.textContent = "Gallery is temporarily unavailable.";
+    return;
+  }
+
+  gallery.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    gallery.textContent = "New Café Adda moments coming soon!";
+    return;
+  }
+
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.style.cssText = "background:white;padding:10px;border-radius:12px;";
+
+    const img = document.createElement("img");
+    img.src = item.image_url;
+    img.alt = "Café Adda " + item.category;
+    img.loading = "lazy";
+    img.style.cssText = "width:100%;height:220px;object-fit:cover;border-radius:9px;";
+
+    const caption = document.createElement("p");
+    caption.textContent = item.category;
+    caption.style.cssText = "padding:8px 3px;color:#651d32;font-weight:bold;";
+
+    card.append(img, caption);
+    gallery.appendChild(card);
+  });
+})();
+</script>
+
 <!-- CAFE ADDA ADMIN PANEL -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -476,6 +510,27 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
     <h3>Existing Menu Items</h3>
     <div id="admin-menu-list"></div>
 
+<hr>
+<h3>Manage Café Adda Gallery</h3>
+
+<label>Photo Category</label>
+<select id="gallery-category" style="width:100%;padding:12px;margin:8px 0;">
+  <option value="Food">Food</option>
+  <option value="Interior">Interior</option>
+  <option value="Events">Events</option>
+</select>
+
+<label>Select Photo</label>
+<input id="gallery-image" type="file" accept="image/*"
+  style="display:block;margin:12px 0;">
+
+<button id="gallery-upload-btn" type="button">Upload Gallery Photo</button>
+<p id="gallery-message"></p>
+
+<hr>
+<h3>Existing Gallery Photos</h3>
+<div id="admin-gallery-list"></div>
+
     <button id="admin-logout-btn" type="button">Logout</button>
   </div>
 </section>
@@ -503,6 +558,7 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
     loginBox.hidden = true;
     dashboard.hidden = false;
     loadMenu();
+    loadGallery();
   }
 
   document.getElementById("admin-login-btn").onclick = async function () {
@@ -664,6 +720,114 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
       };
 
     div.append(title, details, edit, del);
+      list.appendChild(div);
+    });
+  }
+
+  document.getElementById("gallery-upload-btn").onclick = async function () {
+    const msg = document.getElementById("gallery-message");
+    const file = document.getElementById("gallery-image").files[0];
+    const category = document.getElementById("gallery-category").value;
+
+    if (!file) {
+      msg.textContent = "Please select a photo first.";
+      return;
+    }
+
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+      msg.textContent = "Please select an image smaller than 5 MB.";
+      return;
+    }
+
+    msg.textContent = "Uploading photo...";
+
+    const safeName = Date.now() + "-" +
+      file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+    const { error: uploadError } = await db.storage
+      .from("gallery-images")
+      .upload(safeName, file);
+
+    if (uploadError) {
+      msg.textContent = "Upload failed: " + uploadError.message;
+      return;
+    }
+
+    const { data: urlData } = db.storage
+      .from("gallery-images")
+      .getPublicUrl(safeName);
+
+    const { error } = await db.from("gallery_items").insert([{
+      category: category,
+      image_url: urlData.publicUrl
+    }]);
+
+    if (error) {
+      msg.textContent = "Save failed: " + error.message;
+      return;
+    }
+
+    msg.textContent = "Photo uploaded successfully!";
+
+    document.getElementById("gallery-image").value = "";
+    loadGallery();
+  };
+
+  async function loadGallery() {
+    const list = document.getElementById("admin-gallery-list");
+
+    const { data, error } = await db
+      .from("gallery_items")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      list.textContent = "Could not load gallery: " + error.message;
+      return;
+    }
+
+    list.innerHTML = "";
+
+    data.forEach(function (item) {
+      const div = document.createElement("div");
+      div.style.cssText = "padding:12px;border-bottom:1px solid #ddd;";
+
+      const img = document.createElement("img");
+      img.src = item.image_url;
+      img.style.cssText = "width:100px;height:80px;object-fit:cover;border-radius:8px;";
+
+      const title = document.createElement("p");
+      title.textContent = item.category;
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "Delete Photo";
+
+      del.onclick = async function () {
+        if (!confirm("Delete this gallery photo?")) return;
+
+        const { error } = await db
+          .from("gallery_items")
+          .delete()
+          .eq("id", item.id);
+
+        if (error) {
+          alert("Delete failed: " + error.message);
+          return;
+        }
+
+        const marker = "/gallery-images/";
+        const path = item.image_url.split(marker)[1];
+
+        if (path) {
+          await db.storage.from("gallery-images")
+            .remove([decodeURIComponent(path)]);
+        }
+
+        loadGallery();
+      };
+
+      div.append(img, title, del);
       list.appendChild(div);
     });
   }
