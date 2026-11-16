@@ -1042,7 +1042,81 @@ info.appendChild(addButton);
       list.appendChild(div);
     });
   }
+async function loadOrders() {
+  const box = document.getElementById("admin-orders-list");
+  box.textContent = "Loading Orders...";
 
+  const { data, error } = await db
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    box.textContent = "Error loading orders: " + error.message;
+    return;
+  }
+
+  box.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    box.textContent = "No orders received yet.";
+    return;
+  }
+
+  data.forEach(order => {
+    const card = document.createElement("div");
+    card.style.cssText =
+      "background:white;padding:15px;margin:12px 0;border:1px solid #ddd;border-radius:10px;";
+
+    const title = document.createElement("h3");
+    title.textContent = "Order #" + order.id + " — " + order.customer_name;
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Mobile: " + order.customer_phone +
+      " | Type: " + order.fulfilment_type +
+      " | Payment: " + order.payment_method;
+
+    const items = document.createElement("p");
+    items.textContent = "Items: " + JSON.stringify(order.order_items);
+
+    const total = document.createElement("h3");
+    total.textContent = "Total: ₹" + order.total_amount;
+
+    const status = document.createElement("select");
+
+    ["New", "Accepted", "Rejected", "Preparing", "Ready", "Completed"]
+      .forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        status.appendChild(option);
+      });
+
+    status.value = order.order_status || "New";
+
+    status.onchange = async () => {
+      const { error } = await db
+        .from("orders")
+        .update({ order_status: status.value })
+        .eq("id", order.id);
+
+      if (error) {
+        alert("Status update failed: " + error.message);
+        status.value = order.order_status || "New";
+        return;
+      }
+
+      alert("Order status updated!");
+      loadOrders();
+    };
+
+    card.append(title, details, items, total, status);
+    box.appendChild(card);
+  });
+}
+
+document.getElementById("orders-refresh-btn").onclick = loadOrders;
   document.getElementById("admin-logout-btn").onclick = async function () {
     await db.auth.signOut();
     showDashboard();
