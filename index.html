@@ -1099,7 +1099,14 @@ itemsBox.appendChild(itemsTitle);
   itemRow.append(itemName, itemPrice);
   itemsBox.appendChild(itemRow);
 });
-
+if (order.fulfilment_type === "Home Delivery") {
+  const deliveryAddress = document.createElement("p");
+  deliveryAddress.textContent =
+    "📍 Delivery Address: " + (order.delivery_address || "Not provided");
+  deliveryAddress.style.cssText =
+    "background:#fff8e8;padding:10px;border-radius:7px;";
+  card.appendChild(deliveryAddress);
+}
     const total = document.createElement("h3");
     total.textContent = "Total: ₹" + order.total_amount;
 
