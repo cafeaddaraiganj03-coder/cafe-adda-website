@@ -421,13 +421,7 @@ function renderCart() {
   const totalText = document.createElement("h3");
   totalText.textContent = "Total: ₹" + total;
   cartBox.appendChild(totalText);
-const orderButton = document.createElement("button");
-orderButton.textContent = "Place Order on WhatsApp";
-orderButton.type = "button";
-orderButton.style.cssText =
-  "background:#25D366;color:white;border:0;padding:14px 20px;border-radius:9px;font-weight:bold;cursor:pointer;width:100%;margin-top:12px;";
-
-orderButton.onclick = function () {
+function sendCafeOrder(paymentMethod) {
   if (cart.size === 0) {
     alert("Please add food items to your cart.");
     return;
@@ -443,15 +437,35 @@ orderButton.onclick = function () {
   });
 
   message += "\nTotal: ₹" + total;
-  message += "\n\nPlease confirm my order.";
+  message += "\nPayment Method: " + paymentMethod;
+
+  if (paymentMethod === "UPI") {
+    message += "\nPlease share the UPI QR code for payment.";
+  }
+
+  message += "\nPlease confirm my order.";
 
   window.open(
     "https://wa.me/919475611122?text=" + encodeURIComponent(message),
     "_blank"
   );
-};
+}
 
-cartBox.appendChild(orderButton);
+const codButton = document.createElement("button");
+codButton.textContent = "Cash on Delivery (COD)";
+codButton.type = "button";
+codButton.style.cssText =
+  "background:#7b263e;color:white;border:0;padding:14px;border-radius:9px;font-weight:bold;cursor:pointer;width:100%;margin-top:12px;";
+codButton.onclick = () => sendCafeOrder("COD");
+
+const upiButton = document.createElement("button");
+upiButton.textContent = "Pay via UPI";
+upiButton.type = "button";
+upiButton.style.cssText =
+  "background:#16834a;color:white;border:0;padding:14px;border-radius:9px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;";
+upiButton.onclick = () => sendCafeOrder("UPI");
+
+cartBox.append(codButton, upiButton);
   if (cart.size === 0) {
     cartBox.append("Your cart is empty. Add your favourite food!");
   }
