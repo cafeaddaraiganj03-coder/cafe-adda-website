@@ -456,7 +456,7 @@ document.getElementById("bookingForm").addEventListener("submit", function(e){
     img.src = item.image_url;
     img.alt = "Café Adda " + item.category;
     img.loading = "lazy";
-    img.style.cssText = "width:100%;height:220px;object-fit:cover;border-radius:9px;";
+  img.style.cssText = "width:100%;height:260px;object-fit:contain;border-radius:9px;background:#fff;padding:5px;";
 
     const caption = document.createElement("p");
     caption.textContent = item.category;
