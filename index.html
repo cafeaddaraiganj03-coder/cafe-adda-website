@@ -375,6 +375,7 @@ cartBox.style.cssText =
 
 menuBox.appendChild(cartBox);
 
+
 function renderCart() {
   cartBox.innerHTML = "";
 
@@ -382,13 +383,14 @@ function renderCart() {
   title.textContent = "🛒 Your Shopping Cart";
   cartBox.appendChild(title);
 
-  let total = 0;
+  let foodTotal = 0;
 
   cart.forEach((entry) => {
-    total += entry.price * entry.qty;
+    foodTotal += entry.price * entry.qty;
 
     const row = document.createElement("div");
-    row.style.cssText = "display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee;";
+    row.style.cssText =
+      "display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eee;";
 
     const name = document.createElement("span");
     name.textContent = entry.name + " — ₹" + entry.price;
@@ -418,57 +420,126 @@ function renderCart() {
     cartBox.appendChild(row);
   });
 
-  const totalText = document.createElement("h3");
-  totalText.textContent = "Total: ₹" + total;
-  cartBox.appendChild(totalText);
-function sendCafeOrder(paymentMethod) {
   if (cart.size === 0) {
-    alert("Please add food items to your cart.");
+    cartBox.append("Your cart is empty. Add your favourite food!");
     return;
   }
 
-  let message = "Hello Café Adda! I want to place an order:\n\n";
-  let total = 0;
+  const form = document.createElement("form");
+  form.style.cssText = "margin-top:20px;display:grid;gap:12px;";
 
-  cart.forEach(entry => {
-    message += entry.name + " x " + entry.qty +
-      " = ₹" + (entry.price * entry.qty) + "\n";
-    total += entry.price * entry.qty;
+  const customerName = document.createElement("input");
+  customerName.placeholder = "Your Name";
+  customerName.required = true;
+  customerName.style.cssText = "padding:12px;border:1px solid #ccc;border-radius:8px;";
+
+  const customerPhone = document.createElement("input");
+  customerPhone.placeholder = "Mobile Number";
+  customerPhone.type = "tel";
+  customerPhone.required = true;
+  customerPhone.style.cssText = customerName.style.cssText;
+
+  const fulfilment = document.createElement("select");
+  ["Pickup", "Dine-in", "Home Delivery"].forEach(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    fulfilment.appendChild(option);
   });
+  fulfilment.style.cssText = customerName.style.cssText;
 
-  message += "\nTotal: ₹" + total;
-  message += "\nPayment Method: " + paymentMethod;
+  const address = document.createElement("textarea");
+  address.placeholder = "Delivery Address";
+  address.style.cssText = customerName.style.cssText;
+  address.hidden = true;
 
-  if (paymentMethod === "UPI") {
-    message += "\nPlease share the UPI QR code for payment.";
+  fulfilment.onchange = () => {
+    address.hidden = fulfilment.value !== "Home Delivery";
+    address.required = fulfilment.value === "Home Delivery";
+    updateTotal();
+  };
+
+  const payment = document.createElement("select");
+  ["COD", "UPI"].forEach(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value === "COD" ? "Cash on Delivery" : "Pay via UPI";
+    payment.appendChild(option);
+  });
+  payment.style.cssText = customerName.style.cssText;
+
+  const totalText = document.createElement("h3");
+
+  function updateTotal() {
+    const deliveryCharge = fulfilment.value === "Home Delivery" ? 30 : 0;
+    totalText.textContent =
+      "Food Total: ₹" + foodTotal +
+      " | Delivery: ₹" + deliveryCharge +
+      " | Grand Total: ₹" + (foodTotal + deliveryCharge);
   }
 
-  message += "\nPlease confirm my order.";
+  fulfilment.addEventListener("change", updateTotal);
+  updateTotal();
 
-  window.open(
-    "https://wa.me/919475611122?text=" + encodeURIComponent(message),
-    "_blank"
+  const note = document.createElement("p");
+  note.textContent = "UPI payments will be verified manually. Payment QR details will be provided later.";
+  
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.textContent = "Place Order";
+  submit.style.cssText =
+    "background:#7b263e;color:white;border:0;padding:14px;border-radius:9px;font-weight:bold;cursor:pointer;";
+
+  form.append(
+    customerName,
+    customerPhone,
+    fulfilment,
+    address,
+    payment,
+    totalText,
+    note,
+    submit
   );
-}
 
-const codButton = document.createElement("button");
-codButton.textContent = "Cash on Delivery (COD)";
-codButton.type = "button";
-codButton.style.cssText =
-  "background:#7b263e;color:white;border:0;padding:14px;border-radius:9px;font-weight:bold;cursor:pointer;width:100%;margin-top:12px;";
-codButton.onclick = () => sendCafeOrder("COD");
+  form.onsubmit = async (event) => {
+    event.preventDefault();
 
-const upiButton = document.createElement("button");
-upiButton.textContent = "Pay via UPI";
-upiButton.type = "button";
-upiButton.style.cssText =
-  "background:#16834a;color:white;border:0;padding:14px;border-radius:9px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;";
-upiButton.onclick = () => sendCafeOrder("UPI");
+    if (cart.size === 0) return;
 
-cartBox.append(codButton, upiButton);
-  if (cart.size === 0) {
-    cartBox.append("Your cart is empty. Add your favourite food!");
-  }
+    const deliveryCharge = fulfilment.value === "Home Delivery" ? 30 : 0;
+    const finalTotal = foodTotal + deliveryCharge;
+
+    submit.disabled = true;
+    submit.textContent = "Placing Order...";
+
+    const { error } = await client.from("orders").insert([{
+      customer_name: customerName.value.trim(),
+      customer_phone: customerPhone.value.trim(),
+      order_items: Array.from(cart.values()),
+      total_amount: finalTotal,
+      payment_method: payment.value,
+      order_status: "New",
+      fulfilment_type: fulfilment.value,
+      delivery_address: address.value.trim() || null
+    }]);
+
+    if (error) {
+      alert("Order failed: " + error.message);
+      submit.disabled = false;
+      submit.textContent = "Place Order";
+      return;
+    }
+
+    cart.clear();
+    renderCart();
+
+    const success = document.createElement("h3");
+    success.textContent = "Your order has been placed successfully! Café Adda will confirm it shortly.";
+    success.style.color = "green";
+    cartBox.appendChild(success);
+  };
+
+  cartBox.appendChild(form);
 }
 
 renderCart();
